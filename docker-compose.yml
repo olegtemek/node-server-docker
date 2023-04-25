@@ -1,0 +1,47 @@
+version: '3.5'
+services:
+  nginx:
+    container_name: nginx_node
+    restart: always
+    image: nginx
+    ports:
+      - 8000:80
+    volumes:
+      - ./.docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      # - ../Sites/market/nginx.conf:/etc/nginx/conf.d/default.conf  // special nginx 
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - app_network_node
+
+  mysql:
+    container_name: mysql_node
+    image: mysql:8.0
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./.docker/mysql/:/var/lib/mysql
+    networks:
+      - app_network_node
+
+  adminer:
+    container_name: adminer_node
+    image: adminer:latest
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+    ports:
+      - 8080:8080
+    depends_on:
+      - mysql
+    networks:
+      - app_network_node
+
+networks:
+  app_network_node:
+    name: app_network_node
+volumes:
+  postgres:
+  pgadmin:
